@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """module to define our authetications login, logout and sign up"""
-from flask import Blueprint, render_template, flash, request
+from flask import Blueprint, render_template, flash, request, redirect, url_for
+from .models import User
+from werkzeug.security import generate_password_hash, check_password_hash
 
 auth = Blueprint("auth", __name__)
 
@@ -38,7 +40,14 @@ def sign_up():
                 "The Password must be atleast 7 characters long", category="error     "
             )
         else:
+            new_user = User(
+                email=email,
+                fullname=fullname,
+                password=generate_password_hash(password1, method="sha256"),
+            )
+            db.session.add(new_user)
+            db.session.commit()
             flash("Account created!", category="success")
-            pass
+            return redirect(url_for("views.home"))
 
     return render_template("sign_up.html")
