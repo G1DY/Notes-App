@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 from flask_login import UserMixin
-from app.__init__ import db
-from sqlalchemy.sql import func
+from sqlalchemy import func
+from flask import current_app as app
+from . import db
 
 
 class Note(db.Model):
@@ -10,7 +11,7 @@ class Note(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     data = db.Column(db.String(5000))
     date = db.Column(db.DateTime(timezone=True), default=func.now())
-    user_id = db.Column(db.Interger, db.ForeignKey("user.id"))
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"))
 
 
 class User(db.Model, UserMixin):
