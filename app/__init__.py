@@ -6,6 +6,7 @@ from .auth import auth
 from flask_sqlalchemy import SQLAlchemy
 from .models import User, Note
 from os import path
+from flask_login import LoginManager
 
 db = SQLAlchemy()
 DB_NAME = "database.db"
@@ -23,10 +24,20 @@ def create_app():
 
     create_database(app)
 
+    login_manager = LoginManager()
+    login_manager.login_view = "auth.login"
+    login_manager.init_app(app)
+
+    @login_manager.user_loader
+    def load_user(id):
+        """validate user from db"""
+        return User.query.get(int(id))
+
     return app
 
 
 def create_database():
     """creates database"""
     if not path.exists("app/" + DB_NAME):
-        db.create_all(app=app)
+        with app.app_context():
+            db.create_all()
